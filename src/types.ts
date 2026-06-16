@@ -13,6 +13,9 @@ export interface Session {
   selectedDate?: string;
   selectedSlot?: string;
   partySize?: number;
+  guestName?: string;
+  guestPhone?: string;
+  guestTelegramId?: number;
   calendarYear?: number;
   calendarMonth?: number;
 }

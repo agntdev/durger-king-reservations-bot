@@ -13,6 +13,7 @@ import {
   getAvailablePartySizes,
 } from "../services/tables";
 import { buildPartySizeKeyboard, PARTY_SIZE_PROMPT } from "../ui/partySize";
+import { beginContactCollection } from "./contact";
 import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
 
 function currentViewMonth(): { year: number; month: number } {
@@ -137,11 +138,11 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     }
 
     ctx.session.partySize = partySize;
-    ctx.session.step = "party_selected";
     await ctx.answerCallbackQuery();
     await ctx.editMessageText(
-      `Date: ${dateKey}\nTime: ${slotLabel}\nParty size: ${partySize}\n\nNext you'll provide your contact details.`,
+      `Date: ${dateKey}\nTime: ${slotLabel}\nParty size: ${partySize}`,
     );
+    await beginContactCollection(ctx);
   });
 
   bot.callbackQuery("cal:noop", async (ctx) => {
