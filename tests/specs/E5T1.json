@@ -1,0 +1,70 @@
+[
+  {
+    "name": "/help shows the help text",
+    "steps": [
+      {
+        "send": { "text": "/help" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Durger King Reservations Bot"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/start opens the main menu",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Welcome to Durger King Reservations!"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/reserve opens inline calendar",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Choose a date for your reservation."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "calendar month navigation updates the view",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:month:2026-07", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "July 2026"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
