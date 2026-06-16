@@ -1,0 +1,114 @@
+[
+  {
+    "name": "first-time admin setup is available before owner is configured",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Admin Setup\n\nNo owner has been configured yet. Let's set up the admin."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "non-owner is denied admin commands after owner is configured",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "1" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "UTC" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "60" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/bookings_today", "userId": 2 },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "This command is only available to the restaurant owner."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "non-owner is denied /admin after owner is configured",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "1" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "UTC" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "60" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/admin", "userId": 2 },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "This command is only available to the restaurant owner."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "configured owner can use admin booking commands",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "1" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "UTC" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "60" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/bookings_date 2026-07-01", "userId": 1 },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No bookings scheduled for 2026-07-01."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

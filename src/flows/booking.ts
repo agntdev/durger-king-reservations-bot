@@ -7,6 +7,10 @@ import {
   getReservation,
   listReservationsForGuest,
 } from "../services/bookings";
+import {
+  formatGuestBookingsList,
+  isBookingOwner,
+} from "../services/privacy";
 import { formatCancellationNotice, notifyOwner } from "../services/owner";
 import { beginRescheduleFlow } from "./reserve";
 
@@ -23,7 +27,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
-    if (existing.guestTelegramId !== guestId) {
+    if (!isBookingOwner(existing, guestId)) {
       await ctx.editMessageText("You can only cancel your own bookings.");
       return;
     }
@@ -55,7 +59,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
-    if (existing.guestTelegramId !== guestId) {
+    if (!isBookingOwner(existing, guestId)) {
       await ctx.editMessageText("You can only reschedule your own bookings.");
       return;
     }
@@ -73,16 +77,6 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
     }
 
     const bookings = listReservationsForGuest(guestId);
-    if (bookings.length === 0) {
-      await ctx.editMessageText("You do not have any active bookings yet.");
-      return;
-    }
-
-    const lines = bookings.map(
-      (booking) =>
-        `${booking.id} — ${booking.date} ${booking.slot} (${booking.partySize} guests)`,
-    );
-
-    await ctx.editMessageText(`Your bookings:\n\n${lines.join("\n")}`);
+    await ctx.editMessageText(formatGuestBookingsList(bookings));
   });
 }

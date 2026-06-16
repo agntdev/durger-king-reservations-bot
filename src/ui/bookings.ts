@@ -1,4 +1,5 @@
 import type { Reservation } from "../services/bookings";
+import { formatGuestBookingSummary } from "../services/privacy";
 
 export const EMPTY_BOOKINGS_TEXT =
   "Your upcoming bookings will appear here";
@@ -8,10 +9,7 @@ export function formatGuestBookings(bookings: Reservation[]): string {
     return EMPTY_BOOKINGS_TEXT;
   }
 
-  const lines = bookings.map(
-    (booking) =>
-      `${booking.id} — ${booking.date} at ${booking.slot} (${booking.partySize} guests)`,
-  );
+  const lines = bookings.map(formatGuestBookingSummary);
 
   return ["Your upcoming bookings:", "", ...lines].join("\n");
 }

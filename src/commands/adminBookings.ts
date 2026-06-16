@@ -1,7 +1,7 @@
 import { inlineButton, inlineKeyboard } from "@agntdev/bot-toolkit";
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
-import { getOwnerTelegramId } from "../config";
+import { denyUnlessOwner, isOwner } from "../utils/adminAccess";
 import { cancelNoShowCheck } from "../jobs/noShows";
 import { cancelBookingReminder } from "../jobs/reminders";
 import {
@@ -16,20 +16,6 @@ import { TABLE_INVENTORY } from "../services/tables";
 import { toDateKey } from "../ui/calendar";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-function isOwner(ctx: Ctx): boolean {
-  const userId = ctx.from?.id;
-  return userId !== undefined && userId === getOwnerTelegramId();
-}
-
-async function denyUnlessOwner(ctx: Ctx): Promise<boolean> {
-  if (isOwner(ctx)) {
-    return true;
-  }
-
-  await ctx.reply("This command is only available to the restaurant owner.");
-  return false;
-}
 
 function formatBookingLine(booking: Reservation): string {
   return `${booking.id} — ${booking.slot} — ${booking.guestName} (${booking.partySize} guests)`;

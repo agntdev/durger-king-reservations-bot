@@ -1,6 +1,7 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
 import { adminConfig } from "../types";
+import { denyUnlessOwner } from "../utils/adminAccess";
 
 function adminConfigText(): string {
   return [
@@ -56,6 +57,10 @@ async function finishAdminSetup(ctx: Ctx): Promise<void> {
 export function registerAdmin(bot: Bot<Ctx>): void {
   bot.command("admin", async (ctx) => {
     if (adminConfig.ownerId !== undefined) {
+      if (!(await denyUnlessOwner(ctx))) {
+        return;
+      }
+
       ctx.session.step = "admin_menu";
       await ctx.reply(`${adminConfigText()}\n\nChoose what to change:`, {
         reply_markup: adminEditKeyboard(),
@@ -71,21 +76,33 @@ export function registerAdmin(bot: Bot<Ctx>): void {
 
   bot.callbackQuery("admin:edit_owner", async (ctx) => {
     await ctx.answerCallbackQuery();
+    if (adminConfig.ownerId !== undefined && !(await denyUnlessOwner(ctx))) {
+      return;
+    }
     await promptOwnerId(ctx);
   });
 
   bot.callbackQuery("admin:edit_tz", async (ctx) => {
     await ctx.answerCallbackQuery();
+    if (adminConfig.ownerId !== undefined && !(await denyUnlessOwner(ctx))) {
+      return;
+    }
     await promptTimezone(ctx);
   });
 
   bot.callbackQuery("admin:edit_window", async (ctx) => {
     await ctx.answerCallbackQuery();
+    if (adminConfig.ownerId !== undefined && !(await denyUnlessOwner(ctx))) {
+      return;
+    }
     await promptBookingWindow(ctx);
   });
 
   bot.callbackQuery("admin:done", async (ctx) => {
     await ctx.answerCallbackQuery();
+    if (adminConfig.ownerId !== undefined && !(await denyUnlessOwner(ctx))) {
+      return;
+    }
     ctx.session.step = "idle";
     await ctx.editMessageText(
       `${adminConfigText()}\n\nConfiguration unchanged.`,
