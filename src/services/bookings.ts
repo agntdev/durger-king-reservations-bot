@@ -1,7 +1,12 @@
 import { assignTableForParty } from "./tables";
 import type { TableBooking } from "../types";
 
-export type BookingStatus = "booked" | "cancelled" | "rescheduled";
+export type BookingStatus =
+  | "booked"
+  | "arrived"
+  | "cancelled"
+  | "rescheduled"
+  | "no-show";
 
 export interface Reservation extends TableBooking {
   id: string;
@@ -91,5 +96,25 @@ export function cancelBooking(id: string): Reservation | undefined {
   }
 
   booking.status = "cancelled";
+  return booking;
+}
+
+export function markArrived(id: string): Reservation | undefined {
+  const booking = getReservation(id);
+  if (!booking || booking.status !== "booked") {
+    return undefined;
+  }
+
+  booking.status = "arrived";
+  return booking;
+}
+
+export function markNoShow(id: string): Reservation | undefined {
+  const booking = getReservation(id);
+  if (!booking || booking.status !== "booked") {
+    return undefined;
+  }
+
+  booking.status = "no-show";
   return booking;
 }

@@ -62,7 +62,7 @@ async function sendReminder(
 export async function processDueReminders(bot: Bot<Ctx>): Promise<number> {
   let delivered = 0;
 
-  for (const job of listDueJobs()) {
+  for (const job of listDueJobs().filter((entry) => entry.id.startsWith("reminder:"))) {
     const booking = getReservation(job.bookingId);
     if (!booking || booking.status !== "booked") {
       markJobSent(job.id);
@@ -82,7 +82,9 @@ export async function deliverPendingRemindersForGuest(
 ): Promise<number> {
   let delivered = 0;
 
-  for (const job of listPendingJobsForGuest(guestTelegramId)) {
+  for (const job of listPendingJobsForGuest(guestTelegramId).filter((entry) =>
+    entry.id.startsWith("reminder:"),
+  )) {
     const booking = getReservation(job.bookingId);
     if (!booking || booking.status !== "booked") {
       markJobSent(job.id);
