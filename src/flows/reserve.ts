@@ -8,6 +8,7 @@ import {
   parseMonthKey,
   toDateKey,
 } from "../ui/calendar";
+import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
 
 function currentViewMonth(): { year: number; month: number } {
   const now = new Date();
@@ -60,10 +61,40 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     }
 
     ctx.session.selectedDate = dateKey;
-    ctx.session.step = "date_selected";
+    ctx.session.step = "choosing_slot";
+
+    const slots = generateTimeSlots(dateKey);
+    const keyboard = buildTimeSlotKeyboard(slots);
+
+    await ctx.answerCallbackQuery();
+
+    if (slots.length === 0) {
+      await ctx.editMessageText(
+        `No available time slots for ${dateKey}. Please choose another date.`,
+      );
+      return;
+    }
+
+    await ctx.editMessageText(
+      `Date: ${dateKey}\n\nChoose an available time slot:`,
+      { reply_markup: keyboard },
+    );
+  });
+
+  bot.callbackQuery(/^slot:(\d{2}:\d{2})$/, async (ctx) => {
+    const slotLabel = ctx.match[1];
+    const dateKey = ctx.session.selectedDate;
+
+    if (!dateKey || ctx.session.step !== "choosing_slot") {
+      await ctx.answerCallbackQuery({ text: "Please start by selecting a date first." });
+      return;
+    }
+
+    ctx.session.selectedSlot = slotLabel;
+    ctx.session.step = "slot_selected";
     await ctx.answerCallbackQuery();
     await ctx.editMessageText(
-      `Date selected: ${dateKey}.\n\nNext you'll choose an available time slot.`,
+      `Date: ${dateKey}\nTime: ${slotLabel}\n\nNext you'll choose your party size.`,
     );
   });
 

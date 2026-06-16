@@ -1,0 +1,46 @@
+[
+  {
+    "name": "date selection shows available time slots",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Choose an available time slot:"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "time slot selection confirms chosen slot",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Time: 10:00"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
