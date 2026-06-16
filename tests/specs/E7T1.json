@@ -1,0 +1,123 @@
+[
+  {
+    "name": "unexpected text during date selection shows recovery guidance",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "hello there" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "I wasn't expecting text right now. Use the buttons in the message above, or type /reserve to start over."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "invalid guest name shows validation and recovery hint",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "A" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Please enter a valid name (at least 2 characters). Type /reserve to start over if needed."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "invalid phone number shows validation and recovery hint",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "123" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Please enter a valid phone number or tap Share phone number. Type /reserve to start over if needed."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "unknown callback button shows stale action recovery",
+    "steps": [
+      {
+        "send": { "callback": "unknown:action", "messageId": 1 },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "That action is no longer valid. Type /reserve to start a new reservation or /start for the main menu."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "party size callback without active flow shows step recovery",
+    "steps": [
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [
+          {
+            "method": "answerCallbackQuery",
+            "payload": {
+              "text": "Please choose a date and time first."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

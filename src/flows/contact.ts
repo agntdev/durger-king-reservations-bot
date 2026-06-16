@@ -60,7 +60,9 @@ export function registerContactFlow(bot: Bot<Ctx>): void {
     if (ctx.session.step === "collecting_name") {
       const name = ctx.message.text.trim();
       if (name.length < 2) {
-        await ctx.reply("Please enter a valid name (at least 2 characters).");
+        await ctx.reply(
+          "Please enter a valid name (at least 2 characters). Type /reserve to start over if needed.",
+        );
         return;
       }
 
@@ -74,7 +76,7 @@ export function registerContactFlow(bot: Bot<Ctx>): void {
       const phone = normalizePhone(ctx.message.text);
       if (!phone) {
         await ctx.reply(
-          "Please enter a valid phone number or tap Share phone number.",
+          "Please enter a valid phone number or tap Share phone number. Type /reserve to start over if needed.",
         );
         return;
       }
