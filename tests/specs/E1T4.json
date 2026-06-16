@@ -3,25 +3,50 @@
     "name": "party size selection prompts for guest name",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
-      },
-      {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
-      },
-      {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
-      },
-      {
-        "send": { "callback": "party:2", "messageId": 1 },
+        "send": {
+          "text": "/reserve"
+        },
         "expect": [
-          { "method": "editMessageText" },
+          {
+            "method": "sendMessage"
+          }
+        ]
+      },
+      {
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
+      },
+      {
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
+      },
+      {
+        "send": {
+          "callback": "party:2",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          },
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Please enter your full name"
+              "text": "Step 4 of 4 — Guest details\n\nPlease enter your full name for the reservation."
             }
           }
         ]
@@ -32,39 +57,73 @@
     "name": "guest name and phone are collected manually",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "party:2", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+        "send": {
+          "callback": "party:2",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          },
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "text": "Alex Guest" },
+        "send": {
+          "text": "Alex Guest"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Please share your phone number"
+              "text": "Please share your phone number using the button below, or type it manually."
             }
           }
         ]
       },
       {
-        "send": { "text": "+15551234567" },
+        "send": {
+          "text": "+15551234567"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Thanks, Alex Guest!"
+              "text": "New booking\n\nBooking ID: DK-0001\nGuest: Alex Guest\nPhone: +15551234567\nDate: 2026-07-01\nTime: 10:00\nParty size: 2"
             }
           }
         ]

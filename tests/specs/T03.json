@@ -3,12 +3,14 @@
     "name": "/help lists available commands",
     "steps": [
       {
-        "send": { "text": "/help" },
+        "send": {
+          "text": "/help"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Durger King Reservations Bot — commands:"
+              "text": "Durger King Reservations Bot — commands:\n\n/start — open the main menu\n/reserve — book a table (date → time → party size → contact details)\n/reminders — deliver pending reservation reminders\n/admin — configure owner settings (first-time setup)\n/help — show this message\n\nTip: use the inline buttons during booking — each step guides you through the process."
             }
           }
         ]
@@ -19,12 +21,14 @@
     "name": "unknown command gets a friendly fallback",
     "steps": [
       {
-        "send": { "text": "/notreal" },
+        "send": {
+          "text": "/notreal"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "I didn't recognize that command."
+              "text": "I didn't recognize that command. Type /help to see what I can do."
             }
           }
         ]

@@ -3,12 +3,14 @@
     "name": "/reserve opens inline calendar",
     "steps": [
       {
-        "send": { "text": "/reserve" },
+        "send": {
+          "text": "/reserve"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Choose a date for your reservation."
+              "text": "Step 1 of 4 — Choose a date\n\nChoose a date for your reservation. Available dates are shown for the next 60 days.\n\nJune 2026"
             }
           }
         ]
@@ -19,16 +21,25 @@
     "name": "calendar date selection confirms chosen date",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
         "expect": [
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Date selected: 2026-07-01."
+              "text": "Step 2 of 4 — Choose a time\n\nDate: 2026-07-01\n\nChoose an available time slot:"
             }
           }
         ]
@@ -39,16 +50,25 @@
     "name": "calendar month navigation updates the view",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:month:2026-07", "messageId": 1 },
+        "send": {
+          "callback": "cal:month:2026-07",
+          "messageId": 1
+        },
         "expect": [
           {
             "method": "editMessageText",
             "payload": {
-              "text": "July 2026"
+              "text": "Step 1 of 4 — Choose a date\n\nChoose a date for your reservation. Available dates are shown for the next 60 days.\n\nJuly 2026"
             }
           }
         ]

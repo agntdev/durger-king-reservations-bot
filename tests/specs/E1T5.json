@@ -3,32 +3,70 @@
     "name": "completed reservation shows booking confirmation",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "party:2", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+        "send": {
+          "callback": "party:2",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          },
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "text": "Alex Guest" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "Alex Guest"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "text": "+15551234567" },
+        "send": {
+          "text": "+15551234567"
+        },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Booking confirmed!"
+              "text": "New booking\n\nBooking ID: DK-0001\nGuest: Alex Guest\nPhone: +15551234567\nDate: 2026-07-01\nTime: 10:00\nParty size: 2"
             }
           }
         ]
@@ -39,36 +77,84 @@
     "name": "booking confirmation includes inline actions",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "party:2", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+        "send": {
+          "callback": "party:2",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          },
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "text": "Sam Guest" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "Sam Guest"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "text": "+15559876543" },
-        "expect": [{ "method": "sendMessage", "payload": { "text": "Booking ID: DK-" } }]
+        "send": {
+          "text": "+15559876543"
+        },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "New booking\n\nBooking ID: DK-0001\nGuest: Sam Guest\nPhone: +15559876543\nDate: 2026-07-01\nTime: 10:00\nParty size: 2"
+            }
+          }
+        ]
       },
       {
-        "send": { "callback": "booking:list", "messageId": 6 },
+        "send": {
+          "callback": "booking:list",
+          "messageId": 6
+        },
         "expect": [
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Your bookings:"
+              "text": "Your bookings:\n\nDK-0001 — 2026-07-01 10:00 (2 guests)"
             }
           }
         ]
