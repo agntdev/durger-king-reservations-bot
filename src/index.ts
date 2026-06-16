@@ -1,4 +1,5 @@
 import { createBot, type BotContext } from "@agntdev/bot-toolkit";
+import { registerAdmin } from "./commands/admin";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
@@ -16,6 +17,7 @@ export function makeBot() {
   registerStart(bot);
   registerMenu(bot);
   registerReserveFlow(bot);
+  registerAdmin(bot);
   registerHelp(bot);
   registerUnknownCommand(bot);
 
