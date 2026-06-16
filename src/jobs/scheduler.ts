@@ -36,6 +36,10 @@ export function listPendingJobsForGuest(guestTelegramId: number): ScheduledJob[]
   );
 }
 
+export function listPendingJobs(): ScheduledJob[] {
+  return jobs.filter((job) => !job.sent);
+}
+
 export function listDueJobs(now = Date.now()): ScheduledJob[] {
   return jobs.filter((job) => !job.sent && job.runAt <= now);
 }

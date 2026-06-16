@@ -1,0 +1,42 @@
+[
+  {
+    "name": "owner checknoshows flags unarrived booking and notifies owner",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/checknoshows" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No-show flagged"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
