@@ -16,6 +16,7 @@ export interface Session {
   guestName?: string;
   guestPhone?: string;
   guestTelegramId?: number;
+  bookingId?: string;
   calendarYear?: number;
   calendarMonth?: number;
 }

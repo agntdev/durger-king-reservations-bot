@@ -78,6 +78,16 @@ export function canAccommodatePartySize(
   return smallestFittingTable(partySize, tables) !== null;
 }
 
+export function assignTableForParty(
+  partySize: number,
+  date: string,
+  slot: string,
+  bookings: TableBooking[],
+): number | null {
+  const tables = remainingTables(date, slot, bookings);
+  return smallestFittingTable(partySize, tables);
+}
+
 export function getAvailablePartySizes(
   date: string,
   slot: string,
