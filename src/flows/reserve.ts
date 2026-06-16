@@ -33,6 +33,41 @@ function bookingsForAvailability(ctx: Ctx) {
   return listBookingsExcluding(ctx.session.reschedulingBookingId);
 }
 
+function timeSlotPrompt(dateKey: string): string {
+  return withStep(
+    RESERVE_STEPS.time,
+    `Date: ${dateKey}\n\nChoose an available time slot:`,
+  );
+}
+
+async function showTimeSlots(ctx: Ctx, edit = true): Promise<void> {
+  const dateKey = ctx.session.selectedDate;
+  if (!dateKey) {
+    return;
+  }
+
+  const slots = generateTimeSlots(dateKey, bookingsForAvailability(ctx));
+  const keyboard = buildTimeSlotKeyboard(slots, ctx.session.expandedTimeHour);
+  const text = timeSlotPrompt(dateKey);
+
+  if (slots.length === 0) {
+    const emptyText = `No available time slots for ${dateKey}. Please choose another date.`;
+    if (edit && ctx.callbackQuery?.message) {
+      await ctx.editMessageText(emptyText);
+    } else {
+      await ctx.reply(emptyText);
+    }
+    return;
+  }
+
+  if (edit && ctx.callbackQuery?.message) {
+    await ctx.editMessageText(text, { reply_markup: keyboard });
+    return;
+  }
+
+  await ctx.reply(text, { reply_markup: keyboard });
+}
+
 async function showCalendar(
   ctx: Ctx,
   year: number,
@@ -104,26 +139,33 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
 
     ctx.session.selectedDate = dateKey;
     ctx.session.step = "choosing_slot";
-
-    const slots = generateTimeSlots(dateKey, bookingsForAvailability(ctx));
-    const keyboard = buildTimeSlotKeyboard(slots);
+    ctx.session.expandedTimeHour = undefined;
 
     await ctx.answerCallbackQuery();
+    await showTimeSlots(ctx, true);
+  });
 
-    if (slots.length === 0) {
-      await ctx.editMessageText(
-        `No available time slots for ${dateKey}. Please choose another date.`,
-      );
+  bot.callbackQuery(/^slot:hour:(\d+)$/, async (ctx) => {
+    const hour = Number(ctx.match[1]);
+
+    if (!ctx.session.selectedDate || ctx.session.step !== "choosing_slot") {
+      await ctx.answerCallbackQuery({ text: "Please start by selecting a date first." });
       return;
     }
 
-    await ctx.editMessageText(
-      withStep(
-        RESERVE_STEPS.time,
-        `Date: ${dateKey}\n\nChoose an available time slot:`,
-      ),
-      { reply_markup: keyboard },
-    );
+    const dateKey = ctx.session.selectedDate;
+    const slots = generateTimeSlots(dateKey, bookingsForAvailability(ctx));
+    const availableHours = new Set(slots.map((slot) => slot.hour));
+
+    if (!availableHours.has(hour)) {
+      await ctx.answerCallbackQuery({ text: "No slots available for that hour." });
+      return;
+    }
+
+    ctx.session.expandedTimeHour =
+      ctx.session.expandedTimeHour === hour ? undefined : hour;
+    await ctx.answerCallbackQuery();
+    await showTimeSlots(ctx, true);
   });
 
   bot.callbackQuery(/^slot:(\d{2}:\d{2})$/, async (ctx) => {

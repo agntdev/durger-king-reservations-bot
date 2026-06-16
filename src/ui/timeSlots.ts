@@ -4,6 +4,8 @@ export const SLOT_INTERVAL_MINUTES = 15;
 export const BOOKING_DURATION_MINUTES = 90;
 export const OPENING_HOUR = 10;
 export const CLOSING_HOUR = 22;
+export const HOURS_PER_ROW = 4;
+export const MINUTES_PER_ROW = 4;
 
 export interface TimeSlot {
   hour: number;
@@ -53,14 +55,45 @@ export function generateTimeSlots(
   });
 }
 
-export function buildTimeSlotKeyboard(slots: TimeSlot[]) {
+export function groupSlotsByHour(slots: TimeSlot[]): Map<number, TimeSlot[]> {
+  const byHour = new Map<number, TimeSlot[]>();
+  for (const slot of slots) {
+    const hourSlots = byHour.get(slot.hour) ?? [];
+    hourSlots.push(slot);
+    byHour.set(slot.hour, hourSlots);
+  }
+  return byHour;
+}
+
+export function buildTimeSlotKeyboard(slots: TimeSlot[], expandedHour?: number) {
   if (slots.length === 0) {
     return inlineKeyboard([]);
   }
 
-  const rows = slots.map((slot) => [
-    inlineButton(slot.label, `slot:${slot.label}`),
-  ]);
+  const byHour = groupSlotsByHour(slots);
+  const hours = [...byHour.keys()].sort((a, b) => a - b);
+  const rows: Array<Array<{ text: string; callback_data: string }>> = [];
+
+  for (let i = 0; i < hours.length; i += HOURS_PER_ROW) {
+    const chunk = hours.slice(i, i + HOURS_PER_ROW);
+    rows.push(
+      chunk.map((hour) => {
+        const expanded = expandedHour === hour;
+        const icon = expanded ? "▼" : "▶";
+        return inlineButton(`${hour} ${icon}`, `slot:hour:${hour}`);
+      }),
+    );
+
+    if (expandedHour !== undefined && chunk.includes(expandedHour)) {
+      const minuteSlots = byHour.get(expandedHour) ?? [];
+      for (let j = 0; j < minuteSlots.length; j += MINUTES_PER_ROW) {
+        const minuteChunk = minuteSlots.slice(j, j + MINUTES_PER_ROW);
+        rows.push(
+          minuteChunk.map((slot) => inlineButton(slot.label, `slot:${slot.label}`)),
+        );
+      }
+    }
+  }
 
   return inlineKeyboard(rows);
 }

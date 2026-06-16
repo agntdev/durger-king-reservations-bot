@@ -37,6 +37,7 @@ export interface Session {
   reschedulingBookingId?: string;
   calendarYear?: number;
   calendarMonth?: number;
+  expandedTimeHour?: number;
   adminSetupOwnerId?: number;
   adminSetupTimezone?: string;
   adminSetupWindow?: number;

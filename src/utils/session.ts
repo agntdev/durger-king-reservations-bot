@@ -11,6 +11,7 @@ const RESERVATION_FIELDS: (keyof Session)[] = [
   "reschedulingBookingId",
   "calendarYear",
   "calendarMonth",
+  "expandedTimeHour",
 ];
 
 export function resetReservationSession(session: Session): void {
