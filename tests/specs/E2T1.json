@@ -1,0 +1,42 @@
+[
+  {
+    "name": "/reminders delivers pending guest reminder after booking",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/reminders" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Reminder: your Durger King reservation is coming up."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

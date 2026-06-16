@@ -1,5 +1,6 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
+import { scheduleBookingReminder } from "../jobs/reminders";
 import { createBooking } from "../services/bookings";
 import {
   bookingActionsKeyboard,
@@ -34,6 +35,7 @@ async function completeContactCollection(ctx: Ctx, phone: string): Promise<void>
     guestPhone: phone,
     guestTelegramId,
   });
+  scheduleBookingReminder(booking);
 
   ctx.session.bookingId = booking.id;
   ctx.session.step = "booking_confirmed";

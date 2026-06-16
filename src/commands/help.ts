@@ -5,6 +5,8 @@ export const HELP_TEXT = [
   "Durger King Reservations Bot — commands:",
   "",
   "/start — open the main menu and book a table",
+  "/reserve — book a table",
+  "/reminders — deliver pending reservation reminders",
   "/help — show this message",
 ].join("\n");
 
