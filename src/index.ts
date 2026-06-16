@@ -15,12 +15,14 @@ import {
   SYSTEM_ERROR_TEXT,
 } from "./middleware/errorRecovery";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
+import { resetBookingsStore } from "./services/bookings";
 import { initialSession, resetAdminConfig, type Session } from "./types";
 
 export type Ctx = BotContext<Session>;
 
 export function makeBot() {
   resetAdminConfig();
+  resetBookingsStore();
   const bot = createBot<Session>(process.env.BOT_TOKEN!, {
     initial: initialSession,
   });

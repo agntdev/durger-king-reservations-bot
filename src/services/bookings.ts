@@ -20,6 +20,11 @@ export interface Reservation extends TableBooking {
 let nextBookingNumber = 1;
 const reservations: Reservation[] = [];
 
+export function resetBookingsStore(): void {
+  reservations.length = 0;
+  nextBookingNumber = 1;
+}
+
 function parseSlot(slot: string): { startHour: number; startMinute: number } {
   const [startHour, startMinute] = slot.split(":").map(Number);
   return { startHour, startMinute };
