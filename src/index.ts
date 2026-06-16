@@ -8,6 +8,10 @@ import { startJobWorkers } from "./jobs/workers";
 import { registerBookingActions } from "./flows/booking";
 import { registerContactFlow } from "./flows/contact";
 import { registerReserveFlow } from "./flows/reserve";
+import {
+  registerErrorRecovery,
+  SYSTEM_ERROR_TEXT,
+} from "./middleware/errorRecovery";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
 import { initialSession, type Session } from "./types";
 
@@ -26,14 +30,13 @@ export function makeBot() {
   registerReminders(bot);
   registerNoShowChecks(bot);
   registerHelp(bot);
+  registerErrorRecovery(bot);
   registerUnknownCommand(bot);
 
   bot.catch(async (err) => {
     console.error("Bot error:", err.error);
     try {
-      await err.ctx.reply(
-        "Something went wrong on our side. Please try again in a moment.",
-      );
+      await err.ctx.reply(SYSTEM_ERROR_TEXT);
     } catch {
       // Ignore follow-up failures while replying about the original error.
     }

@@ -21,6 +21,7 @@ import {
 import { buildPartySizeKeyboard, PARTY_SIZE_PROMPT } from "../ui/partySize";
 import { beginContactCollection } from "./contact";
 import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
+import { resetReservationSession } from "../utils/session";
 
 function currentViewMonth(): { year: number; month: number } {
   const now = new Date();
@@ -68,7 +69,7 @@ export async function beginRescheduleFlow(ctx: Ctx, bookingId: string): Promise<
 
 export function registerReserveFlow(bot: Bot<Ctx>): void {
   bot.command("reserve", async (ctx) => {
-    ctx.session.reschedulingBookingId = undefined;
+    resetReservationSession(ctx.session);
     const view = currentViewMonth();
     await showCalendar(ctx, view.year, view.month);
   });
