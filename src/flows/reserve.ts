@@ -8,6 +8,11 @@ import {
   parseMonthKey,
   toDateKey,
 } from "../ui/calendar";
+import {
+  canAccommodatePartySize,
+  getAvailablePartySizes,
+} from "../services/tables";
+import { buildPartySizeKeyboard, PARTY_SIZE_PROMPT } from "../ui/partySize";
 import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
 
 function currentViewMonth(): { year: number; month: number } {
@@ -90,11 +95,52 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
       return;
     }
 
+    const availableSizes = getAvailablePartySizes(dateKey, slotLabel, []);
+    if (availableSizes.length === 0) {
+      await ctx.answerCallbackQuery({
+        text: "No tables can accommodate a party at this time.",
+      });
+      await ctx.editMessageText(
+        `Date: ${dateKey}\nTime: ${slotLabel}\n\nNo party sizes are available for this slot. Please choose another time.`,
+      );
+      return;
+    }
+
     ctx.session.selectedSlot = slotLabel;
-    ctx.session.step = "slot_selected";
+    ctx.session.step = "choosing_party_size";
     await ctx.answerCallbackQuery();
     await ctx.editMessageText(
-      `Date: ${dateKey}\nTime: ${slotLabel}\n\nNext you'll choose your party size.`,
+      `Date: ${dateKey}\nTime: ${slotLabel}\n\n${PARTY_SIZE_PROMPT}`,
+      { reply_markup: buildPartySizeKeyboard(availableSizes) },
+    );
+  });
+
+  bot.callbackQuery(/^party:(\d)$/, async (ctx) => {
+    const partySize = Number(ctx.match[1]);
+    const dateKey = ctx.session.selectedDate;
+    const slotLabel = ctx.session.selectedSlot;
+
+    if (
+      !dateKey ||
+      !slotLabel ||
+      ctx.session.step !== "choosing_party_size"
+    ) {
+      await ctx.answerCallbackQuery({ text: "Please choose a date and time first." });
+      return;
+    }
+
+    if (!canAccommodatePartySize(partySize, dateKey, slotLabel, [])) {
+      await ctx.answerCallbackQuery({
+        text: "That party size cannot be seated at this time.",
+      });
+      return;
+    }
+
+    ctx.session.partySize = partySize;
+    ctx.session.step = "party_selected";
+    await ctx.answerCallbackQuery();
+    await ctx.editMessageText(
+      `Date: ${dateKey}\nTime: ${slotLabel}\nParty size: ${partySize}\n\nNext you'll provide your contact details.`,
     );
   });
 
