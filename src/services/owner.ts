@@ -12,6 +12,19 @@ export async function notifyOwner(
   return true;
 }
 
+export function formatNewBookingNotice(booking: Reservation): string {
+  return [
+    "New booking",
+    "",
+    `Booking ID: ${booking.id}`,
+    `Guest: ${booking.guestName}`,
+    `Phone: ${booking.guestPhone}`,
+    `Date: ${booking.date}`,
+    `Time: ${booking.slot}`,
+    `Party size: ${booking.partySize}`,
+  ].join("\n");
+}
+
 export function formatCancellationNotice(booking: Reservation): string {
   return [
     "Booking cancelled",
