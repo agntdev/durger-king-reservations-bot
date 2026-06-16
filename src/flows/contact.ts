@@ -4,10 +4,12 @@ import { scheduleNoShowCheck } from "../jobs/noShows";
 import { scheduleBookingReminder } from "../jobs/reminders";
 import { createBooking } from "../services/bookings";
 import {
+  BOOKING_NEXT_STEPS_TEXT,
   bookingActionsKeyboard,
   formatBookingConfirmation,
 } from "../ui/confirmation";
 import { NAME_PROMPT, PHONE_PROMPT, phoneKeyboard } from "../ui/contact";
+import { RESERVE_STEPS, withStep } from "../ui/progress";
 import { normalizePhone } from "../utils/phone";
 
 async function completeContactCollection(ctx: Ctx, phone: string): Promise<void> {
@@ -45,6 +47,7 @@ async function completeContactCollection(ctx: Ctx, phone: string): Promise<void>
   await ctx.reply(formatBookingConfirmation(booking), {
     reply_markup: bookingActionsKeyboard(booking.id),
   });
+  await ctx.reply(BOOKING_NEXT_STEPS_TEXT);
 }
 
 export async function beginContactCollection(ctx: Ctx): Promise<void> {
@@ -52,7 +55,7 @@ export async function beginContactCollection(ctx: Ctx): Promise<void> {
     ctx.session.guestTelegramId = ctx.from.id;
   }
   ctx.session.step = "collecting_name";
-  await ctx.reply(NAME_PROMPT);
+  await ctx.reply(withStep(RESERVE_STEPS.contact, NAME_PROMPT));
 }
 
 export function registerContactFlow(bot: Bot<Ctx>): void {

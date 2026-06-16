@@ -21,6 +21,7 @@ import {
 import { buildPartySizeKeyboard, PARTY_SIZE_PROMPT } from "../ui/partySize";
 import { beginContactCollection } from "./contact";
 import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
+import { RESERVE_STEPS, withStep } from "../ui/progress";
 import { resetReservationSession } from "../utils/session";
 
 function currentViewMonth(): { year: number; month: number } {
@@ -44,7 +45,10 @@ async function showCalendar(
   ctx.session.calendarYear = view.year;
   ctx.session.calendarMonth = view.month;
 
-  const text = `${prompt}\n\n${formatMonthLabel(view.year, view.month)}`;
+  const body = ctx.session.reschedulingBookingId
+    ? prompt
+    : withStep(RESERVE_STEPS.date, prompt);
+  const text = `${body}\n\n${formatMonthLabel(view.year, view.month)}`;
   const keyboard = buildCalendarKeyboard(view.year, view.month);
 
   if (edit && ctx.callbackQuery?.message) {
@@ -67,11 +71,15 @@ export async function beginRescheduleFlow(ctx: Ctx, bookingId: string): Promise<
   );
 }
 
+export async function beginReserveFlow(ctx: Ctx): Promise<void> {
+  resetReservationSession(ctx.session);
+  const view = currentViewMonth();
+  await showCalendar(ctx, view.year, view.month);
+}
+
 export function registerReserveFlow(bot: Bot<Ctx>): void {
   bot.command("reserve", async (ctx) => {
-    resetReservationSession(ctx.session);
-    const view = currentViewMonth();
-    await showCalendar(ctx, view.year, view.month);
+    await beginReserveFlow(ctx);
   });
 
   bot.callbackQuery(/^cal:month:(\d{4})-(\d{2})$/, async (ctx) => {
@@ -110,7 +118,10 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     }
 
     await ctx.editMessageText(
-      `Date: ${dateKey}\n\nChoose an available time slot:`,
+      withStep(
+        RESERVE_STEPS.time,
+        `Date: ${dateKey}\n\nChoose an available time slot:`,
+      ),
       { reply_markup: keyboard },
     );
   });
@@ -143,7 +154,10 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     ctx.session.step = "choosing_party_size";
     await ctx.answerCallbackQuery();
     await ctx.editMessageText(
-      `Date: ${dateKey}\nTime: ${slotLabel}\n\n${PARTY_SIZE_PROMPT}`,
+      withStep(
+        RESERVE_STEPS.party,
+        `Date: ${dateKey}\nTime: ${slotLabel}\n\n${PARTY_SIZE_PROMPT}`,
+      ),
       { reply_markup: buildPartySizeKeyboard(availableSizes) },
     );
   });
