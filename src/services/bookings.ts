@@ -25,16 +25,28 @@ function parseSlot(slot: string): { startHour: number; startMinute: number } {
   return { startHour, startMinute };
 }
 
+function toTableBooking(booking: Reservation): TableBooking {
+  return {
+    date: booking.date,
+    startHour: booking.startHour,
+    startMinute: booking.startMinute,
+    partySize: booking.partySize,
+    tableSeats: booking.tableSeats,
+  };
+}
+
 export function listBookings(): TableBooking[] {
   return reservations
     .filter((booking) => booking.status === "booked")
-    .map((booking) => ({
-      date: booking.date,
-      startHour: booking.startHour,
-      startMinute: booking.startMinute,
-      partySize: booking.partySize,
-      tableSeats: booking.tableSeats,
-    }));
+    .map(toTableBooking);
+}
+
+export function listBookingsExcluding(excludeId?: string): TableBooking[] {
+  return reservations
+    .filter(
+      (booking) => booking.status === "booked" && booking.id !== excludeId,
+    )
+    .map(toTableBooking);
 }
 
 export function listReservationsForGuest(telegramId: number): Reservation[] {
@@ -106,6 +118,43 @@ export function markArrived(id: string): Reservation | undefined {
   }
 
   booking.status = "arrived";
+  return booking;
+}
+
+export interface RescheduleBookingInput {
+  date: string;
+  slot: string;
+  partySize: number;
+}
+
+export function rescheduleBooking(
+  id: string,
+  input: RescheduleBookingInput,
+): Reservation | undefined {
+  const booking = getReservation(id);
+  if (!booking || booking.status !== "booked") {
+    return undefined;
+  }
+
+  const tableSeats = assignTableForParty(
+    input.partySize,
+    input.date,
+    input.slot,
+    listBookingsExcluding(id),
+  );
+
+  if (tableSeats === null) {
+    return undefined;
+  }
+
+  const { startHour, startMinute } = parseSlot(input.slot);
+  booking.date = input.date;
+  booking.slot = input.slot;
+  booking.startHour = startHour;
+  booking.startMinute = startMinute;
+  booking.partySize = input.partySize;
+  booking.tableSeats = tableSeats;
+
   return booking;
 }
 

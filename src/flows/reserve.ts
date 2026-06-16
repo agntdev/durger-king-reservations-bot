@@ -1,18 +1,23 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
+import { cancelNoShowCheck, scheduleNoShowCheck } from "../jobs/noShows";
+import {
+  cancelBookingReminder,
+  scheduleBookingReminder,
+} from "../jobs/reminders";
+import { listBookings, listBookingsExcluding, rescheduleBooking } from "../services/bookings";
+import { formatRescheduleNotice, notifyOwner } from "../services/owner";
+import {
+  canAccommodatePartySize,
+  getAvailablePartySizes,
+} from "../services/tables";
 import {
   buildCalendarKeyboard,
   CALENDAR_PROMPT,
   formatMonthLabel,
   isDateSelectable,
   parseMonthKey,
-  toDateKey,
 } from "../ui/calendar";
-import { listBookings } from "../services/bookings";
-import {
-  canAccommodatePartySize,
-  getAvailablePartySizes,
-} from "../services/tables";
 import { buildPartySizeKeyboard, PARTY_SIZE_PROMPT } from "../ui/partySize";
 import { beginContactCollection } from "./contact";
 import { buildTimeSlotKeyboard, generateTimeSlots } from "../ui/timeSlots";
@@ -22,18 +27,23 @@ function currentViewMonth(): { year: number; month: number } {
   return { year: now.getFullYear(), month: now.getMonth() + 1 };
 }
 
+function bookingsForAvailability(ctx: Ctx) {
+  return listBookingsExcluding(ctx.session.reschedulingBookingId);
+}
+
 async function showCalendar(
   ctx: Ctx,
   year: number,
   month: number,
   edit = false,
+  prompt = CALENDAR_PROMPT,
 ): Promise<void> {
   const view = parseMonthKey(year, month);
   ctx.session.step = "choosing_date";
   ctx.session.calendarYear = view.year;
   ctx.session.calendarMonth = view.month;
 
-  const text = `${CALENDAR_PROMPT}\n\n${formatMonthLabel(view.year, view.month)}`;
+  const text = `${prompt}\n\n${formatMonthLabel(view.year, view.month)}`;
   const keyboard = buildCalendarKeyboard(view.year, view.month);
 
   if (edit && ctx.callbackQuery?.message) {
@@ -44,8 +54,21 @@ async function showCalendar(
   await ctx.reply(text, { reply_markup: keyboard });
 }
 
+export async function beginRescheduleFlow(ctx: Ctx, bookingId: string): Promise<void> {
+  ctx.session.reschedulingBookingId = bookingId;
+  const view = currentViewMonth();
+  await showCalendar(
+    ctx,
+    view.year,
+    view.month,
+    true,
+    "Choose a new date for your rescheduled reservation.",
+  );
+}
+
 export function registerReserveFlow(bot: Bot<Ctx>): void {
   bot.command("reserve", async (ctx) => {
+    ctx.session.reschedulingBookingId = undefined;
     const view = currentViewMonth();
     await showCalendar(ctx, view.year, view.month);
   });
@@ -54,7 +77,10 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     const year = Number(ctx.match[1]);
     const month = Number(ctx.match[2]);
     await ctx.answerCallbackQuery();
-    await showCalendar(ctx, year, month, true);
+    const prompt = ctx.session.reschedulingBookingId
+      ? "Choose a new date for your rescheduled reservation."
+      : CALENDAR_PROMPT;
+    await showCalendar(ctx, year, month, true, prompt);
   });
 
   bot.callbackQuery(/^cal:date:(\d{4}-\d{2}-\d{2})$/, async (ctx) => {
@@ -70,7 +96,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     ctx.session.selectedDate = dateKey;
     ctx.session.step = "choosing_slot";
 
-    const slots = generateTimeSlots(dateKey, listBookings());
+    const slots = generateTimeSlots(dateKey, bookingsForAvailability(ctx));
     const keyboard = buildTimeSlotKeyboard(slots);
 
     await ctx.answerCallbackQuery();
@@ -100,7 +126,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     const availableSizes = getAvailablePartySizes(
       dateKey,
       slotLabel,
-      listBookings(),
+      bookingsForAvailability(ctx),
     );
     if (availableSizes.length === 0) {
       await ctx.answerCallbackQuery({
@@ -125,6 +151,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     const partySize = Number(ctx.match[1]);
     const dateKey = ctx.session.selectedDate;
     const slotLabel = ctx.session.selectedSlot;
+    const reschedulingId = ctx.session.reschedulingBookingId;
 
     if (
       !dateKey ||
@@ -135,7 +162,14 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
       return;
     }
 
-    if (!canAccommodatePartySize(partySize, dateKey, slotLabel, listBookings())) {
+    if (
+      !canAccommodatePartySize(
+        partySize,
+        dateKey,
+        slotLabel,
+        bookingsForAvailability(ctx),
+      )
+    ) {
       await ctx.answerCallbackQuery({
         text: "That party size cannot be seated at this time.",
       });
@@ -144,6 +178,35 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
 
     ctx.session.partySize = partySize;
     await ctx.answerCallbackQuery();
+
+    if (reschedulingId) {
+      const updated = rescheduleBooking(reschedulingId, {
+        date: dateKey,
+        slot: slotLabel,
+        partySize,
+      });
+
+      if (!updated) {
+        await ctx.editMessageText(
+          "That reschedule could not be completed. Please try another date or time.",
+        );
+        return;
+      }
+
+      cancelBookingReminder(reschedulingId);
+      cancelNoShowCheck(reschedulingId);
+      scheduleBookingReminder(updated);
+      scheduleNoShowCheck(updated);
+      await notifyOwner(bot, formatRescheduleNotice(updated));
+
+      ctx.session.reschedulingBookingId = undefined;
+      ctx.session.step = "booking_confirmed";
+      await ctx.editMessageText(
+        `Booking ${reschedulingId} rescheduled to ${dateKey} at ${slotLabel} for ${partySize} guests.`,
+      );
+      return;
+    }
+
     await ctx.editMessageText(
       `Date: ${dateKey}\nTime: ${slotLabel}\nParty size: ${partySize}`,
     );
@@ -154,4 +217,3 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     await ctx.answerCallbackQuery();
   });
 }
-
