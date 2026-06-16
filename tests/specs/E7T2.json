@@ -1,0 +1,111 @@
+[
+  {
+    "name": "main menu reserve launches the booking calendar",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "menu:reserve", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Let's reserve a table."
+            }
+          },
+          {
+            "method": "sendMessage"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "main menu bookings shows empty state message",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "menu:bookings", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Your upcoming bookings will appear here"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "reservation flow shows step progress for time selection",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      }
+    ]
+  },
+  {
+    "name": "booking confirmation includes next-step guidance",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [
+          { "method": "sendMessage" },
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "What happens next:\n• You'll get a reminder 2 hours before your reservation\n• Use the buttons below to cancel or reschedule if plans change\n• Type /start any time to return to the main menu"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/help explains the reservation flow",
+    "steps": [
+      {
+        "send": { "text": "/help" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Durger King Reservations Bot — commands:\n\n/start — open the main menu\n/reserve — book a table (date → time → party size → contact details)\n/reminders — deliver pending reservation reminders\n/admin — configure owner settings (first-time setup)\n/help — show this message\n\nTip: use the inline buttons during booking — each step guides you through the process."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -4,10 +4,13 @@ import type { Ctx } from "../index";
 export const HELP_TEXT = [
   "Durger King Reservations Bot — commands:",
   "",
-  "/start — open the main menu and book a table",
-  "/reserve — book a table",
+  "/start — open the main menu",
+  "/reserve — book a table (date → time → party size → contact details)",
   "/reminders — deliver pending reservation reminders",
+  "/admin — configure owner settings (first-time setup)",
   "/help — show this message",
+  "",
+  "Tip: use the inline buttons during booking — each step guides you through the process.",
 ].join("\n");
 
 export function registerHelp(bot: Bot<Ctx>): void {
