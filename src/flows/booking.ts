@@ -34,8 +34,8 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
-    cancelBookingReminder(bookingId);
-    cancelNoShowCheck(bookingId);
+    await cancelBookingReminder(bookingId);
+    await cancelNoShowCheck(bookingId);
     await notifyOwner(bot, formatCancellationNotice(booking));
 
     await ctx.editMessageText(

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "/reminders shows no reminders when none are due",
+    "steps": [
+      {
+        "send": { "text": "/reminders" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No reminders are due for your bookings right now."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/checknoshows reports no pending checks",
+    "steps": [
+      {
+        "send": { "text": "/checknoshows" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No pending no-show checks to process."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

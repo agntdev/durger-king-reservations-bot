@@ -33,9 +33,9 @@ export function formatReminderMessage(booking: Reservation): string {
   ].join("\n");
 }
 
-export function scheduleBookingReminder(booking: Reservation): void {
+export async function scheduleBookingReminder(booking: Reservation): Promise<void> {
   const runAt = bookingDateTime(booking).getTime() - REMINDER_LEAD_MS;
-  scheduleJob({
+  await scheduleJob({
     id: reminderJobId(booking.id),
     runAt,
     bookingId: booking.id,
@@ -43,8 +43,8 @@ export function scheduleBookingReminder(booking: Reservation): void {
   });
 }
 
-export function cancelBookingReminder(bookingId: string): void {
-  cancelJob(reminderJobId(bookingId));
+export async function cancelBookingReminder(bookingId: string): Promise<void> {
+  await cancelJob(reminderJobId(bookingId));
 }
 
 async function sendReminder(
@@ -56,16 +56,16 @@ async function sendReminder(
     booking.guestTelegramId,
     formatReminderMessage(booking),
   );
-  markJobSent(jobId);
+  await markJobSent(jobId);
 }
 
 export async function processDueReminders(bot: Bot<Ctx>): Promise<number> {
   let delivered = 0;
 
-  for (const job of listDueJobs().filter((entry) => entry.id.startsWith("reminder:"))) {
+  for (const job of (await listDueJobs()).filter((entry) => entry.id.startsWith("reminder:"))) {
     const booking = getReservation(job.bookingId);
     if (!booking || booking.status !== "booked") {
-      markJobSent(job.id);
+      await markJobSent(job.id);
       continue;
     }
 
@@ -82,12 +82,12 @@ export async function deliverPendingRemindersForGuest(
 ): Promise<number> {
   let delivered = 0;
 
-  for (const job of listPendingJobsForGuest(guestTelegramId).filter((entry) =>
+  for (const job of (await listPendingJobsForGuest(guestTelegramId)).filter((entry) =>
     entry.id.startsWith("reminder:"),
   )) {
     const booking = getReservation(job.bookingId);
     if (!booking || booking.status !== "booked") {
-      markJobSent(job.id);
+      await markJobSent(job.id);
       continue;
     }
 
