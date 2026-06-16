@@ -2,6 +2,7 @@ import { createBot, type BotContext } from "@agntdev/bot-toolkit";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
+import { registerBookingActions } from "./flows/booking";
 import { registerContactFlow } from "./flows/contact";
 import { registerReserveFlow } from "./flows/reserve";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
@@ -18,6 +19,7 @@ export function makeBot() {
   registerMenu(bot);
   registerReserveFlow(bot);
   registerContactFlow(bot);
+  registerBookingActions(bot);
   registerHelp(bot);
   registerUnknownCommand(bot);
 

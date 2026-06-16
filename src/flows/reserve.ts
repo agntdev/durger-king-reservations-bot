@@ -8,6 +8,7 @@ import {
   parseMonthKey,
   toDateKey,
 } from "../ui/calendar";
+import { listBookings } from "../services/bookings";
 import {
   canAccommodatePartySize,
   getAvailablePartySizes,
@@ -69,7 +70,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     ctx.session.selectedDate = dateKey;
     ctx.session.step = "choosing_slot";
 
-    const slots = generateTimeSlots(dateKey);
+    const slots = generateTimeSlots(dateKey, listBookings());
     const keyboard = buildTimeSlotKeyboard(slots);
 
     await ctx.answerCallbackQuery();
@@ -96,7 +97,11 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
       return;
     }
 
-    const availableSizes = getAvailablePartySizes(dateKey, slotLabel, []);
+    const availableSizes = getAvailablePartySizes(
+      dateKey,
+      slotLabel,
+      listBookings(),
+    );
     if (availableSizes.length === 0) {
       await ctx.answerCallbackQuery({
         text: "No tables can accommodate a party at this time.",
@@ -130,7 +135,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
       return;
     }
 
-    if (!canAccommodatePartySize(partySize, dateKey, slotLabel, [])) {
+    if (!canAccommodatePartySize(partySize, dateKey, slotLabel, listBookings())) {
       await ctx.answerCallbackQuery({
         text: "That party size cannot be seated at this time.",
       });
