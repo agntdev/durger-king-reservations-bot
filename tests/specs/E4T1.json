@@ -1,0 +1,154 @@
+[
+  {
+    "name": "/admin starts admin setup when not configured",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Admin Setup\n\nNo owner has been configured yet. Let's set up the admin."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup prompts for owner ID",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Please send the owner's Telegram ID (a number)."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup accepts valid owner ID",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "123456789" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Owner ID set to 123456789."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup rejects non-numeric owner ID",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "not-a-number" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "That doesn't look like a valid Telegram ID. Please send a numeric ID."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup accepts timezone input",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "555555555" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "UTC+3" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Timezone set to UTC+3."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup accepts booking window input",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "111111111" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Europe/Moscow" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "90" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Booking window set to 90 days."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "admin setup completes with summary",
+    "steps": [
+      {
+        "send": { "text": "/admin" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "777777777" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "UTC" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "30" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Admin configuration saved:\n\nAdmin Configuration\n\nOwner ID: 777777777\nTimezone: UTC\nBooking window: 30 days"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

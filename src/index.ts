@@ -1,4 +1,5 @@
 import { createBot, type BotContext } from "@agntdev/bot-toolkit";
+import { registerAdmin } from "./commands/admin";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
@@ -13,11 +14,12 @@ import {
   SYSTEM_ERROR_TEXT,
 } from "./middleware/errorRecovery";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
-import { initialSession, type Session } from "./types";
+import { initialSession, resetAdminConfig, type Session } from "./types";
 
 export type Ctx = BotContext<Session>;
 
 export function makeBot() {
+  resetAdminConfig();
   const bot = createBot<Session>(process.env.BOT_TOKEN!, {
     initial: initialSession,
   });
@@ -25,6 +27,7 @@ export function makeBot() {
   registerStart(bot);
   registerMenu(bot);
   registerReserveFlow(bot);
+  registerAdmin(bot);
   registerContactFlow(bot);
   registerBookingActions(bot);
   registerReminders(bot);

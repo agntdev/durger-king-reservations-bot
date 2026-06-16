@@ -13,7 +13,7 @@ import {
 } from "../services/tables";
 import {
   buildCalendarKeyboard,
-  CALENDAR_PROMPT,
+  calendarPrompt,
   formatMonthLabel,
   isDateSelectable,
   parseMonthKey,
@@ -37,7 +37,7 @@ async function showCalendar(
   year: number,
   month: number,
   edit = false,
-  prompt = CALENDAR_PROMPT,
+  prompt = calendarPrompt(),
 ): Promise<void> {
   const view = parseMonthKey(year, month);
   ctx.session.step = "choosing_date";
@@ -80,7 +80,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     await ctx.answerCallbackQuery();
     const prompt = ctx.session.reschedulingBookingId
       ? "Choose a new date for your rescheduled reservation."
-      : CALENDAR_PROMPT;
+      : calendarPrompt();
     await showCalendar(ctx, year, month, true, prompt);
   });
 
