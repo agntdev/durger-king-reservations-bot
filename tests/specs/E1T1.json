@@ -1,0 +1,58 @@
+[
+  {
+    "name": "/reserve opens inline calendar",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Choose a date for your reservation."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "calendar date selection confirms chosen date",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Date selected: 2026-07-01."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "calendar month navigation updates the view",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:month:2026-07", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "July 2026"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
