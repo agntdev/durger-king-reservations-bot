@@ -1,5 +1,5 @@
 import { inlineButton, inlineKeyboard } from "@agntdev/bot-toolkit";
-import { BOOKING_WINDOW_DAYS } from "../types";
+import { adminConfig } from "../types";
 
 export function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -35,7 +35,7 @@ export function formatMonthLabel(year: number, month: number): string {
 
 export function isDateSelectable(date: Date, today = startOfDay(new Date())): boolean {
   const target = startOfDay(date);
-  const lastBookable = addDays(today, BOOKING_WINDOW_DAYS);
+  const lastBookable = addDays(today, adminConfig.bookingWindowDays);
   return target >= today && target <= lastBookable;
 }
 
@@ -120,5 +120,8 @@ export function buildCalendarKeyboard(
   return inlineKeyboard(rows);
 }
 
-export const CALENDAR_PROMPT =
-  "Choose a date for your reservation. Available dates are shown for the next 60 days.";
+export function calendarPrompt(): string {
+  return `Choose a date for your reservation. Available dates are shown for the next ${adminConfig.bookingWindowDays} days.`;
+}
+
+export const CALENDAR_PROMPT = calendarPrompt();
