@@ -1,6 +1,8 @@
 import { createBot, type BotContext } from "@agntdev/bot-toolkit";
+import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
+import { registerUnknownCommand } from "./middleware/unknownCommand";
 
 interface Session {
   step: string;
@@ -19,6 +21,19 @@ export function makeBot() {
 
   registerStart(bot);
   registerMenu(bot);
+  registerHelp(bot);
+  registerUnknownCommand(bot);
+
+  bot.catch(async (err) => {
+    console.error("Bot error:", err.error);
+    try {
+      await err.ctx.reply(
+        "Something went wrong on our side. Please try again in a moment.",
+      );
+    } catch {
+      // Ignore follow-up failures while replying about the original error.
+    }
+  });
 
   return bot;
 }

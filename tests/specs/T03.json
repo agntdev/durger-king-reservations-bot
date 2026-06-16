@@ -1,0 +1,34 @@
+[
+  {
+    "name": "/help lists available commands",
+    "steps": [
+      {
+        "send": { "text": "/help" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Durger King Reservations Bot — commands:"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "unknown command gets a friendly fallback",
+    "steps": [
+      {
+        "send": { "text": "/notreal" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "I didn't recognize that command."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
