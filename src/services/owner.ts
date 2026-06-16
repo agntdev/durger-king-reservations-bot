@@ -24,6 +24,18 @@ export function formatCancellationNotice(booking: Reservation): string {
   ].join("\n");
 }
 
+export function formatRescheduleNotice(booking: Reservation): string {
+  return [
+    "Booking rescheduled",
+    "",
+    `Booking ID: ${booking.id}`,
+    `Guest: ${booking.guestName}`,
+    `New date: ${booking.date}`,
+    `New time: ${booking.slot}`,
+    `Party size: ${booking.partySize}`,
+  ].join("\n");
+}
+
 export function formatNoShowNotice(booking: Reservation): string {
   return [
     "No-show flagged",

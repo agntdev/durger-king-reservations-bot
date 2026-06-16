@@ -8,6 +8,7 @@ import {
   listReservationsForGuest,
 } from "../services/bookings";
 import { formatCancellationNotice, notifyOwner } from "../services/owner";
+import { beginRescheduleFlow } from "./reserve";
 
 export function registerBookingActions(bot: Bot<Ctx>): void {
   bot.callbackQuery(/^booking:cancel:(.+)$/, async (ctx) => {
@@ -44,10 +45,22 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
 
   bot.callbackQuery(/^booking:reschedule:(.+)$/, async (ctx) => {
     const bookingId = ctx.match[1];
+    const guestId = ctx.from?.id;
+    const existing = getReservation(bookingId);
+
     await ctx.answerCallbackQuery();
-    await ctx.editMessageText(
-      `Rescheduling for booking ${bookingId} will open the calendar flow in a later update. For now, cancel and book again.`,
-    );
+
+    if (!guestId || !existing) {
+      await ctx.editMessageText("That booking could not be found.");
+      return;
+    }
+
+    if (existing.guestTelegramId !== guestId) {
+      await ctx.editMessageText("You can only reschedule your own bookings.");
+      return;
+    }
+
+    await beginRescheduleFlow(ctx, bookingId);
   });
 
   bot.callbackQuery("booking:list", async (ctx) => {
