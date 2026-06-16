@@ -59,8 +59,8 @@ function formatBookingsForDate(date: string, bookings: Reservation[]): string {
   ].join("\n");
 }
 
-function formatCapacityForDate(date: string): string {
-  const bookings = listReservationsByDate(date);
+async function formatCapacityForDate(date: string): Promise<string> {
+  const bookings = await listReservationsByDate(date);
   const totalTables = TABLE_INVENTORY.length;
 
   return [
@@ -84,8 +84,11 @@ function formatNoShows(bookings: Reservation[]): string {
   ].join("\n");
 }
 
-async function replyWithBookingsForDate(ctx: Ctx, date: string): Promise<void> {
-  const bookings = listReservationsByDate(date);
+async function replyWithBookingsForDate(
+  ctx: Ctx,
+  date: string,
+): Promise<void> {
+  const bookings = await listReservationsByDate(date);
   await ctx.reply(formatBookingsForDate(date, bookings), {
     reply_markup: adminBookingActionsKeyboard(bookings),
   });
@@ -123,7 +126,8 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
     }
 
     const today = toDateKey(new Date());
-    await ctx.reply(formatCapacityForDate(today));
+    const text = await formatCapacityForDate(today);
+    await ctx.reply(text);
   });
 
   bot.command("no_shows", async (ctx) => {
@@ -131,7 +135,8 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
       return;
     }
 
-    await ctx.reply(formatNoShows(listNoShowBookings()));
+    const noShows = await listNoShowBookings();
+    await ctx.reply(formatNoShows(noShows));
   });
 
   bot.callbackQuery(/^admin:arrived:(.+)$/, async (ctx) => {
@@ -141,7 +146,7 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
     }
 
     const bookingId = ctx.match[1];
-    const booking = markArrived(bookingId);
+    const booking = await markArrived(bookingId);
     await ctx.answerCallbackQuery();
 
     if (!booking) {
@@ -160,7 +165,7 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
     }
 
     const bookingId = ctx.match[1];
-    const booking = cancelBooking(bookingId);
+    const booking = await cancelBooking(bookingId);
     await ctx.answerCallbackQuery();
 
     if (!booking) {

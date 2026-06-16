@@ -1,0 +1,134 @@
+[
+  {
+    "name": "cancelling unknown booking shows not found error",
+    "steps": [
+      {
+        "send": { "callback": "booking:cancel:DK-9999", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "That booking could not be found."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "guest can cancel their own booking after reservation",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "booking:cancel:DK-0001", "messageId": 6 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Booking DK-0001 has been cancelled."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "booking confirmation includes guest name and phone for the guest",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Jane Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15559876543" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Booking confirmed!"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "guest booking list shows own bookings without exposing phone numbers",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "List Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15552223344" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "booking:list", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Your bookings:\n\nDK-0001 — 2026-07-01 10:00 (2 guests)"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

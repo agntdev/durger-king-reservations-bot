@@ -24,7 +24,7 @@ export function registerMenu(bot: Bot<Ctx>): void {
       return;
     }
 
-    const bookings = listReservationsForGuest(guestId);
+    const bookings = await listReservationsForGuest(guestId);
     await ctx.editMessageText(formatGuestBookings(bookings), {
       reply_markup: mainMenuKeyboard(),
     });

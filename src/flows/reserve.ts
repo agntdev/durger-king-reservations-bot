@@ -5,7 +5,10 @@ import {
   cancelBookingReminder,
   scheduleBookingReminder,
 } from "../jobs/reminders";
-import { listBookings, listBookingsExcluding, rescheduleBooking } from "../services/bookings";
+import {
+  listBookingsExcluding,
+  rescheduleBooking,
+} from "../services/bookings";
 import { formatRescheduleNotice, notifyOwner } from "../services/owner";
 import {
   canAccommodatePartySize,
@@ -29,9 +32,11 @@ function currentViewMonth(): { year: number; month: number } {
   return { year: now.getFullYear(), month: now.getMonth() + 1 };
 }
 
-function bookingsForAvailability(ctx: Ctx) {
+async function bookingsForAvailability(ctx: Ctx): Promise<TableBooking[]> {
   return listBookingsExcluding(ctx.session.reschedulingBookingId);
 }
+
+import type { TableBooking } from "../types";
 
 async function showCalendar(
   ctx: Ctx,
@@ -59,7 +64,10 @@ async function showCalendar(
   await ctx.reply(text, { reply_markup: keyboard });
 }
 
-export async function beginRescheduleFlow(ctx: Ctx, bookingId: string): Promise<void> {
+export async function beginRescheduleFlow(
+  ctx: Ctx,
+  bookingId: string,
+): Promise<void> {
   ctx.session.reschedulingBookingId = bookingId;
   const view = currentViewMonth();
   await showCalendar(
@@ -105,7 +113,8 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     ctx.session.selectedDate = dateKey;
     ctx.session.step = "choosing_slot";
 
-    const slots = generateTimeSlots(dateKey, bookingsForAvailability(ctx));
+    const available = await bookingsForAvailability(ctx);
+    const slots = generateTimeSlots(dateKey, available);
     const keyboard = buildTimeSlotKeyboard(slots);
 
     await ctx.answerCallbackQuery();
@@ -131,15 +140,14 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     const dateKey = ctx.session.selectedDate;
 
     if (!dateKey || ctx.session.step !== "choosing_slot") {
-      await ctx.answerCallbackQuery({ text: "Please start by selecting a date first." });
+      await ctx.answerCallbackQuery({
+        text: "Please start by selecting a date first.",
+      });
       return;
     }
 
-    const availableSizes = getAvailablePartySizes(
-      dateKey,
-      slotLabel,
-      bookingsForAvailability(ctx),
-    );
+    const avail = await bookingsForAvailability(ctx);
+    const availableSizes = getAvailablePartySizes(dateKey, slotLabel, avail);
     if (availableSizes.length === 0) {
       await ctx.answerCallbackQuery({
         text: "No tables can accommodate a party at this time.",
@@ -168,22 +176,16 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     const slotLabel = ctx.session.selectedSlot;
     const reschedulingId = ctx.session.reschedulingBookingId;
 
-    if (
-      !dateKey ||
-      !slotLabel ||
-      ctx.session.step !== "choosing_party_size"
-    ) {
-      await ctx.answerCallbackQuery({ text: "Please choose a date and time first." });
+    if (!dateKey || !slotLabel || ctx.session.step !== "choosing_party_size") {
+      await ctx.answerCallbackQuery({
+        text: "Please choose a date and time first.",
+      });
       return;
     }
 
+    const avail = await bookingsForAvailability(ctx);
     if (
-      !canAccommodatePartySize(
-        partySize,
-        dateKey,
-        slotLabel,
-        bookingsForAvailability(ctx),
-      )
+      !canAccommodatePartySize(partySize, dateKey, slotLabel, avail)
     ) {
       await ctx.answerCallbackQuery({
         text: "That party size cannot be seated at this time.",
@@ -195,7 +197,7 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
     await ctx.answerCallbackQuery();
 
     if (reschedulingId) {
-      const updated = rescheduleBooking(reschedulingId, {
+      const updated = await rescheduleBooking(reschedulingId, {
         date: dateKey,
         slot: slotLabel,
         partySize,

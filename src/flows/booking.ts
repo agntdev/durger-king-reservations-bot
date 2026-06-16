@@ -14,7 +14,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
   bot.callbackQuery(/^booking:cancel:(.+)$/, async (ctx) => {
     const bookingId = ctx.match[1];
     const guestId = ctx.from?.id;
-    const existing = getReservation(bookingId);
+    const existing = await getReservation(bookingId);
 
     await ctx.answerCallbackQuery();
 
@@ -28,7 +28,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
-    const booking = cancelBooking(bookingId);
+    const booking = await cancelBooking(bookingId);
     if (!booking) {
       await ctx.editMessageText("That booking could not be cancelled.");
       return;
@@ -46,7 +46,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
   bot.callbackQuery(/^booking:reschedule:(.+)$/, async (ctx) => {
     const bookingId = ctx.match[1];
     const guestId = ctx.from?.id;
-    const existing = getReservation(bookingId);
+    const existing = await getReservation(bookingId);
 
     await ctx.answerCallbackQuery();
 
@@ -72,7 +72,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
-    const bookings = listReservationsForGuest(guestId);
+    const bookings = await listReservationsForGuest(guestId);
     if (bookings.length === 0) {
       await ctx.editMessageText("You do not have any active bookings yet.");
       return;

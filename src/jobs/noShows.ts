@@ -1,7 +1,11 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
 import { getOwnerTelegramId } from "../config";
-import { getReservation, markNoShow, type Reservation } from "../services/bookings";
+import {
+  getReservation,
+  markNoShow,
+  type Reservation,
+} from "../services/bookings";
 import { formatNoShowNotice, notifyOwner } from "../services/owner";
 import {
   cancelJob,
@@ -22,9 +26,11 @@ export function noShowJobId(bookingId: string): string {
   return `noshow:${bookingId}`;
 }
 
-export function scheduleNoShowCheck(booking: Reservation): void {
+export async function scheduleNoShowCheck(
+  booking: Reservation,
+): Promise<void> {
   const runAt = bookingDateTime(booking).getTime() + NO_SHOW_GRACE_MS;
-  scheduleJob({
+  await scheduleJob({
     id: noShowJobId(booking.id),
     runAt,
     bookingId: booking.id,
@@ -32,38 +38,42 @@ export function scheduleNoShowCheck(booking: Reservation): void {
   });
 }
 
-export function cancelNoShowCheck(bookingId: string): void {
-  cancelJob(noShowJobId(bookingId));
+export async function cancelNoShowCheck(bookingId: string): Promise<void> {
+  await cancelJob(noShowJobId(bookingId));
 }
 
 function isNoShowJob(jobId: string): boolean {
   return jobId.startsWith("noshow:");
 }
 
-async function processNoShowJob(bot: Bot<Ctx>, jobId: string): Promise<boolean> {
+async function processNoShowJob(
+  bot: Bot<Ctx>,
+  jobId: string,
+): Promise<boolean> {
   const bookingId = jobId.replace(/^noshow:/, "");
-  const booking = getReservation(bookingId);
+  const booking = await getReservation(bookingId);
 
   if (!booking || booking.status !== "booked") {
-    markJobSent(jobId);
+    await markJobSent(jobId);
     return false;
   }
 
-  const updated = markNoShow(bookingId);
+  const updated = await markNoShow(bookingId);
   if (!updated) {
-    markJobSent(jobId);
+    await markJobSent(jobId);
     return false;
   }
 
   await notifyOwner(bot, formatNoShowNotice(updated));
-  markJobSent(jobId);
+  await markJobSent(jobId);
   return true;
 }
 
 export async function processDueNoShows(bot: Bot<Ctx>): Promise<number> {
   let processed = 0;
 
-  for (const job of listDueJobs().filter((entry) => isNoShowJob(entry.id))) {
+  const dueJobs = await listDueJobs();
+  for (const job of dueJobs.filter((entry) => isNoShowJob(entry.id))) {
     if (await processNoShowJob(bot, job.id)) {
       processed += 1;
     }
@@ -75,7 +85,8 @@ export async function processDueNoShows(bot: Bot<Ctx>): Promise<number> {
 export async function processPendingNoShows(bot: Bot<Ctx>): Promise<number> {
   let processed = 0;
 
-  for (const job of listPendingJobs().filter((entry) => isNoShowJob(entry.id))) {
+  const pending = await listPendingJobs();
+  for (const job of pending.filter((entry) => isNoShowJob(entry.id))) {
     if (await processNoShowJob(bot, job.id)) {
       processed += 1;
     }
@@ -88,7 +99,9 @@ export function registerNoShowChecks(bot: Bot<Ctx>): void {
   bot.command("checknoshows", async (ctx) => {
     const ownerId = getOwnerTelegramId();
     if (ctx.from?.id !== ownerId) {
-      await ctx.reply("This command is only available to the restaurant owner.");
+      await ctx.reply(
+        "This command is only available to the restaurant owner.",
+      );
       return;
     }
 

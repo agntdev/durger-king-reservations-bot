@@ -35,7 +35,7 @@ async function completeContactCollection(
   ctx.session.guestPhone = phone;
   ctx.session.guestTelegramId = guestTelegramId;
 
-  const booking = createBooking({
+  const booking = await createBooking({
     date,
     slot,
     partySize,

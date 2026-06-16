@@ -1,3 +1,9 @@
+import {
+  getPersistentStorage,
+  scheduleJobKey,
+  scheduleJobIdsKey,
+} from "../services/storage";
+
 export interface ScheduledJob {
   id: string;
   runAt: number;
@@ -6,47 +12,103 @@ export interface ScheduledJob {
   sent: boolean;
 }
 
-const jobs: ScheduledJob[] = [];
+async function readJobIds(): Promise<string[]> {
+  const storage = getPersistentStorage();
+  const raw = await storage.read(scheduleJobIdsKey());
+  if (Array.isArray(raw)) return raw as string[];
+  return [];
+}
 
-export function scheduleJob(
+async function writeJobIds(ids: string[]): Promise<void> {
+  const storage = getPersistentStorage();
+  await storage.write(scheduleJobIdsKey(), ids);
+}
+
+async function readJob(id: string): Promise<ScheduledJob | undefined> {
+  const storage = getPersistentStorage();
+  const raw = await storage.read(scheduleJobKey(id));
+  if (!raw) return undefined;
+  return raw as ScheduledJob;
+}
+
+async function writeJob(job: ScheduledJob): Promise<void> {
+  const storage = getPersistentStorage();
+  await storage.write(scheduleJobKey(job.id), job);
+}
+
+async function deleteJobKey(id: string): Promise<void> {
+  const storage = getPersistentStorage();
+  await storage.delete(scheduleJobKey(id));
+}
+
+export async function scheduleJob(
   job: Omit<ScheduledJob, "sent">,
-): ScheduledJob {
-  const existingIndex = jobs.findIndex((entry) => entry.id === job.id);
+): Promise<ScheduledJob> {
   const scheduled: ScheduledJob = { ...job, sent: false };
 
-  if (existingIndex >= 0) {
-    jobs[existingIndex] = scheduled;
-    return scheduled;
+  const ids = await readJobIds();
+  if (!ids.includes(job.id)) {
+    ids.push(job.id);
+    await writeJobIds(ids);
   }
 
-  jobs.push(scheduled);
+  await writeJob(scheduled);
   return scheduled;
 }
 
-export function cancelJob(id: string): void {
-  const index = jobs.findIndex((entry) => entry.id === id);
-  if (index >= 0) {
-    jobs.splice(index, 1);
+export async function cancelJob(id: string): Promise<void> {
+  const ids = await readJobIds();
+  const filtered = ids.filter((entry) => entry !== id);
+  if (filtered.length !== ids.length) {
+    await writeJobIds(filtered);
   }
+  await deleteJobKey(id);
 }
 
-export function listPendingJobsForGuest(guestTelegramId: number): ScheduledJob[] {
-  return jobs.filter(
-    (job) => job.guestTelegramId === guestTelegramId && !job.sent,
-  );
+export async function listPendingJobsForGuest(
+  guestTelegramId: number,
+): Promise<ScheduledJob[]> {
+  const ids = await readJobIds();
+  const results: ScheduledJob[] = [];
+  for (const id of ids) {
+    const job = await readJob(id);
+    if (job && job.guestTelegramId === guestTelegramId && !job.sent) {
+      results.push(job);
+    }
+  }
+  return results;
 }
 
-export function listPendingJobs(): ScheduledJob[] {
-  return jobs.filter((job) => !job.sent);
+export async function listPendingJobs(): Promise<ScheduledJob[]> {
+  const ids = await readJobIds();
+  const results: ScheduledJob[] = [];
+  for (const id of ids) {
+    const job = await readJob(id);
+    if (job && !job.sent) {
+      results.push(job);
+    }
+  }
+  return results;
 }
 
-export function listDueJobs(now = Date.now()): ScheduledJob[] {
-  return jobs.filter((job) => !job.sent && job.runAt <= now);
+export async function listDueJobs(
+  now = Date.now(),
+): Promise<ScheduledJob[]> {
+  const ids = await readJobIds();
+  const results: ScheduledJob[] = [];
+  for (const id of ids) {
+    const job = await readJob(id);
+    if (job && !job.sent && job.runAt <= now) {
+      results.push(job);
+    }
+  }
+  return results;
 }
 
-export function markJobSent(id: string): void {
-  const job = jobs.find((entry) => entry.id === id);
+export async function markJobSent(id: string): Promise<void> {
+  const job = await readJob(id);
   if (job) {
     job.sent = true;
+    await writeJob(job);
   }
 }
