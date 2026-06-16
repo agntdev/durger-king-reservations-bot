@@ -1,0 +1,74 @@
+[
+  {
+    "name": "party size selection prompts for guest name",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [
+          { "method": "editMessageText" },
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Please enter your full name"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "guest name and phone are collected manually",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Please share your phone number"
+            }
+          }
+        ]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Thanks, Alex Guest!"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
