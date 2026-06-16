@@ -2,17 +2,11 @@ import { createBot, type BotContext } from "@agntdev/bot-toolkit";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
+import { registerReserveFlow } from "./flows/reserve";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
-
-interface Session {
-  step: string;
-}
+import { initialSession, type Session } from "./types";
 
 export type Ctx = BotContext<Session>;
-
-function initialSession(): Session {
-  return { step: "idle" };
-}
 
 export function makeBot() {
   const bot = createBot<Session>(process.env.BOT_TOKEN!, {
@@ -21,6 +15,7 @@ export function makeBot() {
 
   registerStart(bot);
   registerMenu(bot);
+  registerReserveFlow(bot);
   registerHelp(bot);
   registerUnknownCommand(bot);
 
