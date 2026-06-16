@@ -32,7 +32,7 @@
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Booking DK-0001 has been cancelled."
+              "text": "Booking DK-0001 has been cancelled. The table is available again. Tap /start to make a new reservation."
             }
           }
         ]
@@ -69,13 +69,13 @@
       {
         "send": { "callback": "booking:cancel:DK-0001", "messageId": 6 },
         "expect": [
-          { "method": "editMessageText" },
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Booking cancelled"
+              "text": "Booking cancelled\n\nBooking ID: DK-0001\nGuest: Sam Guest\nDate: 2026-07-01\nTime: 10:00\nParty size: 2"
             }
-          }
+          },
+          { "method": "editMessageText" }
         ]
       }
     ]
