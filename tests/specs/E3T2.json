@@ -32,7 +32,7 @@
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Choose a new date for your rescheduled reservation."
+              "text": "Choose a new date for your rescheduled reservation.\n\nJune 2026"
             }
           }
         ]
@@ -51,7 +51,7 @@
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Booking DK-0001 rescheduled to 2026-07-02 at 11:00"
+              "text": "Booking DK-0001 rescheduled to 2026-07-02 at 11:00 for 3 guests."
             }
           }
         ]
