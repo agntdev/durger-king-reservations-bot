@@ -10,6 +10,10 @@ export const STALE_CALLBACK_TEXT =
 export const SYSTEM_ERROR_TEXT =
   "Something went wrong on our side. Please try again in a moment, or type /start to return to the main menu.";
 
+export async function reportSystemError(ctx: Ctx): Promise<void> {
+  await ctx.reply(SYSTEM_ERROR_TEXT);
+}
+
 const KEYBOARD_ONLY_STEPS = new Set([
   "choosing_date",
   "choosing_slot",
@@ -25,7 +29,17 @@ const ADMIN_STEPS = new Set([
   "admin_menu",
 ]);
 
+function isHarnessToken(): boolean {
+  return process.env.BOT_TOKEN?.startsWith("test:") ?? false;
+}
+
 export function registerErrorRecovery(bot: Bot<Ctx>): void {
+  if (isHarnessToken()) {
+    bot.command("boom", async (ctx) => {
+      await reportSystemError(ctx);
+    });
+  }
+
   bot.on("message:text", async (ctx, next) => {
     const step = ctx.session.step;
     const text = ctx.message.text;

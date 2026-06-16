@@ -12,7 +12,7 @@ import { registerContactFlow } from "./flows/contact";
 import { registerReserveFlow } from "./flows/reserve";
 import {
   registerErrorRecovery,
-  SYSTEM_ERROR_TEXT,
+  reportSystemError,
 } from "./middleware/errorRecovery";
 import { registerUnknownCommand } from "./middleware/unknownCommand";
 import { resetBookingsStore } from "./services/bookings";
@@ -43,7 +43,7 @@ export function makeBot() {
   bot.catch(async (err) => {
     console.error("Bot error:", err.error);
     try {
-      await err.ctx.reply(SYSTEM_ERROR_TEXT);
+      await reportSystemError(err.ctx);
     } catch {
       // Ignore follow-up failures while replying about the original error.
     }
