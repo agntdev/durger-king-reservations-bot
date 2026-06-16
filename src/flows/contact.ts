@@ -43,8 +43,8 @@ async function completeContactCollection(
     guestPhone: phone,
     guestTelegramId,
   });
-  scheduleBookingReminder(booking);
-  scheduleNoShowCheck(booking);
+  await scheduleBookingReminder(booking);
+  await scheduleNoShowCheck(booking);
   await notifyOwner(bot, formatNewBookingNotice(booking));
 
   ctx.session.bookingId = booking.id;

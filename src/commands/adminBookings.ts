@@ -149,7 +149,7 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
       return;
     }
 
-    cancelNoShowCheck(bookingId);
+    await cancelNoShowCheck(bookingId);
     await ctx.reply(`Booking ${bookingId} marked as arrived.`);
   });
 
@@ -168,8 +168,8 @@ export function registerAdminBookings(bot: Bot<Ctx>): void {
       return;
     }
 
-    cancelBookingReminder(bookingId);
-    cancelNoShowCheck(bookingId);
+    await cancelBookingReminder(bookingId);
+    await cancelNoShowCheck(bookingId);
     await notifyOwner(bot, formatCancellationNotice(booking));
     await ctx.reply(`Booking ${bookingId} cancelled.`);
   });

@@ -22,9 +22,9 @@ export function noShowJobId(bookingId: string): string {
   return `noshow:${bookingId}`;
 }
 
-export function scheduleNoShowCheck(booking: Reservation): void {
+export async function scheduleNoShowCheck(booking: Reservation): Promise<void> {
   const runAt = bookingDateTime(booking).getTime() + NO_SHOW_GRACE_MS;
-  scheduleJob({
+  await scheduleJob({
     id: noShowJobId(booking.id),
     runAt,
     bookingId: booking.id,
@@ -32,8 +32,8 @@ export function scheduleNoShowCheck(booking: Reservation): void {
   });
 }
 
-export function cancelNoShowCheck(bookingId: string): void {
-  cancelJob(noShowJobId(bookingId));
+export async function cancelNoShowCheck(bookingId: string): Promise<void> {
+  await cancelJob(noShowJobId(bookingId));
 }
 
 function isNoShowJob(jobId: string): boolean {
@@ -45,25 +45,25 @@ async function processNoShowJob(bot: Bot<Ctx>, jobId: string): Promise<boolean> 
   const booking = getReservation(bookingId);
 
   if (!booking || booking.status !== "booked") {
-    markJobSent(jobId);
+    await markJobSent(jobId);
     return false;
   }
 
   const updated = markNoShow(bookingId);
   if (!updated) {
-    markJobSent(jobId);
+    await markJobSent(jobId);
     return false;
   }
 
   await notifyOwner(bot, formatNoShowNotice(updated));
-  markJobSent(jobId);
+  await markJobSent(jobId);
   return true;
 }
 
 export async function processDueNoShows(bot: Bot<Ctx>): Promise<number> {
   let processed = 0;
 
-  for (const job of listDueJobs().filter((entry) => isNoShowJob(entry.id))) {
+  for (const job of (await listDueJobs()).filter((entry) => isNoShowJob(entry.id))) {
     if (await processNoShowJob(bot, job.id)) {
       processed += 1;
     }
@@ -75,7 +75,7 @@ export async function processDueNoShows(bot: Bot<Ctx>): Promise<number> {
 export async function processPendingNoShows(bot: Bot<Ctx>): Promise<number> {
   let processed = 0;
 
-  for (const job of listPendingJobs().filter((entry) => isNoShowJob(entry.id))) {
+  for (const job of (await listPendingJobs()).filter((entry) => isNoShowJob(entry.id))) {
     if (await processNoShowJob(bot, job.id)) {
       processed += 1;
     }

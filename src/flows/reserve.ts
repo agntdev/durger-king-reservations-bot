@@ -208,10 +208,10 @@ export function registerReserveFlow(bot: Bot<Ctx>): void {
         return;
       }
 
-      cancelBookingReminder(reschedulingId);
-      cancelNoShowCheck(reschedulingId);
-      scheduleBookingReminder(updated);
-      scheduleNoShowCheck(updated);
+      await cancelBookingReminder(reschedulingId);
+      await cancelNoShowCheck(reschedulingId);
+      await scheduleBookingReminder(updated);
+      await scheduleNoShowCheck(updated);
       await notifyOwner(bot, formatRescheduleNotice(updated));
 
       ctx.session.reschedulingBookingId = undefined;
