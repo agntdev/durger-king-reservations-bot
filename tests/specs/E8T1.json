@@ -1,0 +1,38 @@
+[
+  {
+    "name": "unhandled handler error shows generic system message",
+    "steps": [
+      {
+        "send": { "text": "/boom" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Something went wrong on our side. Please try again in a moment, or type /start to return to the main menu."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/start resets to main menu after mid-flow interruption",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/start" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Welcome to Durger King Reservations!\n\nBook a table, view your bookings, or manage an existing reservation.\nChoose an option below to get started."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
