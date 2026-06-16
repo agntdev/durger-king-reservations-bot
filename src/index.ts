@@ -1,4 +1,6 @@
 import { createBot, type BotContext } from "@agntdev/bot-toolkit";
+import { registerMenu } from "./commands/menu";
+import { registerStart } from "./commands/start";
 
 interface Session {
   step: string;
@@ -15,9 +17,8 @@ export function makeBot() {
     initial: initialSession,
   });
 
-  bot.on("message:text", async (ctx) => {
-    await ctx.reply("Durger King Reservations Bot is online.");
-  });
+  registerStart(bot);
+  registerMenu(bot);
 
   return bot;
 }

@@ -1,0 +1,58 @@
+[
+  {
+    "name": "/start shows welcome and main menu",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Welcome to Durger King Reservations!"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "main menu reserve button routes to reservation",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "menu:reserve", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Let's reserve a table."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "main menu bookings button routes to bookings view",
+    "steps": [
+      {
+        "send": { "text": "/start" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "menu:bookings", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Your upcoming bookings will appear here"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
