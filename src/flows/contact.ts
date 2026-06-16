@@ -3,6 +3,7 @@ import type { Ctx } from "../index";
 import { scheduleNoShowCheck } from "../jobs/noShows";
 import { scheduleBookingReminder } from "../jobs/reminders";
 import { createBooking } from "../services/bookings";
+import { formatNewBookingNotice, notifyOwner } from "../services/owner";
 import {
   BOOKING_NEXT_STEPS_TEXT,
   bookingActionsKeyboard,
@@ -12,7 +13,11 @@ import { NAME_PROMPT, PHONE_PROMPT, phoneKeyboard } from "../ui/contact";
 import { RESERVE_STEPS, withStep } from "../ui/progress";
 import { normalizePhone } from "../utils/phone";
 
-async function completeContactCollection(ctx: Ctx, phone: string): Promise<void> {
+async function completeContactCollection(
+  bot: Bot<Ctx>,
+  ctx: Ctx,
+  phone: string,
+): Promise<void> {
   const date = ctx.session.selectedDate;
   const slot = ctx.session.selectedSlot;
   const partySize = ctx.session.partySize;
@@ -40,6 +45,7 @@ async function completeContactCollection(ctx: Ctx, phone: string): Promise<void>
   });
   scheduleBookingReminder(booking);
   scheduleNoShowCheck(booking);
+  await notifyOwner(bot, formatNewBookingNotice(booking));
 
   ctx.session.bookingId = booking.id;
   ctx.session.step = "booking_confirmed";
@@ -84,7 +90,7 @@ export function registerContactFlow(bot: Bot<Ctx>): void {
         return;
       }
 
-      await completeContactCollection(ctx, phone);
+      await completeContactCollection(bot, ctx, phone);
       return;
     }
 
@@ -105,6 +111,6 @@ export function registerContactFlow(bot: Bot<Ctx>): void {
       return;
     }
 
-    await completeContactCollection(ctx, contact.phone_number);
+    await completeContactCollection(bot, ctx, contact.phone_number);
   });
 }
