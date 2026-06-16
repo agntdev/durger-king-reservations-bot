@@ -1,0 +1,19 @@
+{
+  "name": "durger-king-reservations-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/bot.js",
+    "dev": "tsc && node dist/src/bot.js"
+  },
+  "dependencies": {
+    "@agntdev/bot-toolkit": "file:./lib/bot-toolkit",
+    "grammy": "^1.44.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.46",
+    "typescript": "^5.8.3"
+  }
+}

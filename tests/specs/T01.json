@@ -1,0 +1,9 @@
+[
+  {
+    "name": "start command returns welcome",
+    "messages": [
+      "/start",
+      "Welcome to Durger King Reservations Bot! Use /help to see available commands."
+    ]
+  }
+]

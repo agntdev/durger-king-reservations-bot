@@ -1,0 +1,5 @@
+{
+  "commands": [
+    { "command": "start", "description": "Start the bot and see the welcome message" }
+  ]
+}
