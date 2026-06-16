@@ -3,20 +3,36 @@
     "name": "time slot selection prompts party size choices",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
         "expect": [
           {
             "method": "editMessageText",
             "payload": {
-              "text": "How many guests will be dining?"
+              "text": "Step 3 of 4 — Choose party size\n\nDate: 2026-07-01\nTime: 10:00\n\nHow many guests will be dining?"
             }
           }
         ]
@@ -27,24 +43,47 @@
     "name": "valid party size selection is confirmed",
     "steps": [
       {
-        "send": { "text": "/reserve" },
-        "expect": [{ "method": "sendMessage" }]
+        "send": {
+          "text": "/reserve"
+        },
+        "expect": [
+          {
+            "method": "sendMessage"
+          }
+        ]
       },
       {
-        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "cal:date:2026-07-01",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "slot:10:00", "messageId": 1 },
-        "expect": [{ "method": "editMessageText" }]
+        "send": {
+          "callback": "slot:10:00",
+          "messageId": 1
+        },
+        "expect": [
+          {
+            "method": "editMessageText"
+          }
+        ]
       },
       {
-        "send": { "callback": "party:2", "messageId": 1 },
+        "send": {
+          "callback": "party:2",
+          "messageId": 1
+        },
         "expect": [
           {
             "method": "editMessageText",
             "payload": {
-              "text": "Party size: 2"
+              "text": "Date: 2026-07-01\nTime: 10:00\nParty size: 2"
             }
           }
         ]
