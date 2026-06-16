@@ -1,26 +1,44 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
+import { cancelNoShowCheck } from "../jobs/noShows";
 import { cancelBookingReminder } from "../jobs/reminders";
 import {
   cancelBooking,
+  getReservation,
   listReservationsForGuest,
 } from "../services/bookings";
+import { formatCancellationNotice, notifyOwner } from "../services/owner";
 
 export function registerBookingActions(bot: Bot<Ctx>): void {
   bot.callbackQuery(/^booking:cancel:(.+)$/, async (ctx) => {
     const bookingId = ctx.match[1];
-    const booking = cancelBooking(bookingId);
+    const guestId = ctx.from?.id;
+    const existing = getReservation(bookingId);
 
     await ctx.answerCallbackQuery();
 
+    if (!guestId || !existing) {
+      await ctx.editMessageText("That booking could not be found.");
+      return;
+    }
+
+    if (existing.guestTelegramId !== guestId) {
+      await ctx.editMessageText("You can only cancel your own bookings.");
+      return;
+    }
+
+    const booking = cancelBooking(bookingId);
     if (!booking) {
       await ctx.editMessageText("That booking could not be cancelled.");
       return;
     }
 
     cancelBookingReminder(bookingId);
+    cancelNoShowCheck(bookingId);
+    await notifyOwner(bot, formatCancellationNotice(booking));
+
     await ctx.editMessageText(
-      `Booking ${bookingId} has been cancelled. Tap /start to make a new reservation.`,
+      `Booking ${bookingId} has been cancelled. The table is available again. Tap /start to make a new reservation.`,
     );
   });
 
