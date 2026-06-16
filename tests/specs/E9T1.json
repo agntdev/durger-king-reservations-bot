@@ -1,0 +1,169 @@
+[
+  {
+    "name": "date selection shows compact hour grid",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Step 2 of 4 — Choose a time\n\nDate: 2026-07-01\n\nChoose an available time slot:",
+              "reply_markup": {
+                "inline_keyboard": [
+                  [
+                    { "text": "10 ▶", "callback_data": "slot:hour:10" },
+                    { "text": "11 ▶", "callback_data": "slot:hour:11" },
+                    { "text": "12 ▶", "callback_data": "slot:hour:12" },
+                    { "text": "13 ▶", "callback_data": "slot:hour:13" }
+                  ],
+                  [
+                    { "text": "14 ▶", "callback_data": "slot:hour:14" },
+                    { "text": "15 ▶", "callback_data": "slot:hour:15" },
+                    { "text": "16 ▶", "callback_data": "slot:hour:16" },
+                    { "text": "17 ▶", "callback_data": "slot:hour:17" }
+                  ],
+                  [
+                    { "text": "18 ▶", "callback_data": "slot:hour:18" },
+                    { "text": "19 ▶", "callback_data": "slot:hour:19" },
+                    { "text": "20 ▶", "callback_data": "slot:hour:20" }
+                  ]
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "expanding an hour reveals minute slots",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:hour:10", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "reply_markup": {
+                "inline_keyboard": [
+                  [
+                    { "text": "10 ▼", "callback_data": "slot:hour:10" },
+                    { "text": "11 ▶", "callback_data": "slot:hour:11" },
+                    { "text": "12 ▶", "callback_data": "slot:hour:12" },
+                    { "text": "13 ▶", "callback_data": "slot:hour:13" }
+                  ],
+                  [
+                    { "text": "10:00", "callback_data": "slot:10:00" },
+                    { "text": "10:15", "callback_data": "slot:10:15" },
+                    { "text": "10:30", "callback_data": "slot:10:30" },
+                    { "text": "10:45", "callback_data": "slot:10:45" }
+                  ],
+                  [
+                    { "text": "14 ▶", "callback_data": "slot:hour:14" },
+                    { "text": "15 ▶", "callback_data": "slot:hour:15" },
+                    { "text": "16 ▶", "callback_data": "slot:hour:16" },
+                    { "text": "17 ▶", "callback_data": "slot:hour:17" }
+                  ],
+                  [
+                    { "text": "18 ▶", "callback_data": "slot:hour:18" },
+                    { "text": "19 ▶", "callback_data": "slot:hour:19" },
+                    { "text": "20 ▶", "callback_data": "slot:hour:20" }
+                  ]
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "collapsing an hour hides minute slots",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:hour:10", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:hour:10", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "reply_markup": {
+                "inline_keyboard": [
+                  [
+                    { "text": "10 ▶", "callback_data": "slot:hour:10" },
+                    { "text": "11 ▶", "callback_data": "slot:hour:11" },
+                    { "text": "12 ▶", "callback_data": "slot:hour:12" },
+                    { "text": "13 ▶", "callback_data": "slot:hour:13" }
+                  ],
+                  [
+                    { "text": "14 ▶", "callback_data": "slot:hour:14" },
+                    { "text": "15 ▶", "callback_data": "slot:hour:15" },
+                    { "text": "16 ▶", "callback_data": "slot:hour:16" },
+                    { "text": "17 ▶", "callback_data": "slot:hour:17" }
+                  ],
+                  [
+                    { "text": "18 ▶", "callback_data": "slot:hour:18" },
+                    { "text": "19 ▶", "callback_data": "slot:hour:19" },
+                    { "text": "20 ▶", "callback_data": "slot:hour:20" }
+                  ]
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "minute selection proceeds to party size",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:hour:10", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": {
+              "text": "Step 3 of 4 — Choose party size\n\nDate: 2026-07-01\nTime: 10:00\n\nHow many guests will be dining?"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
