@@ -1,0 +1,148 @@
+[
+  {
+    "name": "/bookings_date shows empty state for a date",
+    "steps": [
+      {
+        "send": { "text": "/bookings_date 2026-07-01" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No bookings scheduled for 2026-07-01."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/bookings_date lists a confirmed reservation with admin actions",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/bookings_date 2026-07-01" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Bookings for 2026-07-01:\n\nDK-0001 — 10:00 — Alex Guest (2 guests)\n\nUse the buttons below to update a booking."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/capacity_today reports table inventory",
+    "steps": [
+      {
+        "send": { "text": "/capacity_today" },
+        "expect": [{ "method": "sendMessage" }]
+      }
+    ]
+  },
+  {
+    "name": "admin arrived action marks a booking as arrived",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "admin:arrived:DK-0001" },
+        "expect": [
+          { "method": "answerCallbackQuery" },
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Booking DK-0001 marked as arrived."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "/no_shows lists flagged no-show bookings",
+    "steps": [
+      {
+        "send": { "text": "/reserve" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "callback": "cal:date:2026-07-01", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "slot:10:00", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }]
+      },
+      {
+        "send": { "callback": "party:2", "messageId": 1 },
+        "expect": [{ "method": "editMessageText" }, { "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "Alex Guest" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "+15551234567" },
+        "expect": [{ "method": "sendMessage" }]
+      },
+      {
+        "send": { "text": "/no_shows" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "No no-show bookings recorded."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

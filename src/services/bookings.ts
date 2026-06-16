@@ -56,6 +56,16 @@ export function listReservationsForGuest(telegramId: number): Reservation[] {
   );
 }
 
+export function listReservationsByDate(date: string): Reservation[] {
+  return reservations.filter(
+    (booking) => booking.date === date && booking.status === "booked",
+  );
+}
+
+export function listNoShowBookings(): Reservation[] {
+  return reservations.filter((booking) => booking.status === "no-show");
+}
+
 export function getReservation(id: string): Reservation | undefined {
   return reservations.find((booking) => booking.id === id);
 }
