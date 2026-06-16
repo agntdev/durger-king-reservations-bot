@@ -32,7 +32,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Reminder: your Durger King reservation is coming up."
+              "text": "Reminder: your Durger King reservation is coming up.\n\nBooking ID: DK-0001\nDate: 2026-07-01\nTime: 10:00\nParty size: 2\nWe look forward to seeing you!"
             }
           }
         ]
