@@ -2,6 +2,7 @@ import { createBot, type BotContext } from "@agntdev/bot-toolkit";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
+import { registerReminders, startReminderWorker } from "./jobs/reminders";
 import { registerBookingActions } from "./flows/booking";
 import { registerContactFlow } from "./flows/contact";
 import { registerReserveFlow } from "./flows/reserve";
@@ -20,6 +21,7 @@ export function makeBot() {
   registerReserveFlow(bot);
   registerContactFlow(bot);
   registerBookingActions(bot);
+  registerReminders(bot);
   registerHelp(bot);
   registerUnknownCommand(bot);
 
@@ -38,5 +40,7 @@ export function makeBot() {
 }
 
 if (require.main === module) {
-  makeBot().start();
+  const bot = makeBot();
+  startReminderWorker(bot);
+  bot.start();
 }

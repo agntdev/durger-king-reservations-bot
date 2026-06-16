@@ -1,5 +1,6 @@
 import type { Bot } from "grammy";
 import type { Ctx } from "../index";
+import { cancelBookingReminder } from "../jobs/reminders";
 import {
   cancelBooking,
   listReservationsForGuest,
@@ -17,6 +18,7 @@ export function registerBookingActions(bot: Bot<Ctx>): void {
       return;
     }
 
+    cancelBookingReminder(bookingId);
     await ctx.editMessageText(
       `Booking ${bookingId} has been cancelled. Tap /start to make a new reservation.`,
     );
