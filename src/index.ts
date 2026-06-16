@@ -1,5 +1,6 @@
 import { createBot, type BotContext } from "@agntdev/bot-toolkit";
 import { registerAdmin } from "./commands/admin";
+import { registerAdminBookings } from "./commands/adminBookings";
 import { registerHelp } from "./commands/help";
 import { registerMenu } from "./commands/menu";
 import { registerStart } from "./commands/start";
@@ -28,6 +29,7 @@ export function makeBot() {
   registerMenu(bot);
   registerReserveFlow(bot);
   registerAdmin(bot);
+  registerAdminBookings(bot);
   registerContactFlow(bot);
   registerBookingActions(bot);
   registerReminders(bot);
